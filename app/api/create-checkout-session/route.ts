@@ -29,11 +29,20 @@ export async function POST(req: Request) {
       client_reference_id: userId,
     });
     return NextResponse.json({ sessionId: session.id }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating checkout session:", error);
-    return NextResponse.json(
-      { error: "Error creating checkout session", details: error.message },
-      { status: 500 }
-    );
+
+    // Narrowing the type of error
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: "Error creating checkout session", details: error.message },
+        { status: 500 }
+      );
+    } else {
+      return NextResponse.json(
+        { error: "Unknown error occured" },
+        { status: 500 }
+      );
+    }
   }
 }
